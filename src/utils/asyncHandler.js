@@ -12,7 +12,7 @@ export default asyncHandler;
 // const asyncHandler = () => {}
 // const asyncHandler = (fn) => {() => {}}
 // const asyncHandler = (fn) => () => {}
-// const asyncHandler = (fn) => sync () => {}
+// const asyncHandler = (fn) => async () => {}
 
 // const asyncHandler = (fn) => async (req, res, next) => {
 //   try {
