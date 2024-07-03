@@ -33,6 +33,9 @@ router.route("/register").post(
 );
 
 router.route("/login").post(loginUser);
+router.get('/authorized', verifyJWT, (req, res) => {
+  res.json({ message: 'You are logged in', user: req.user });
+});
 
 //secured routes - need to be logged in before access
 router.route("/logout").post(verifyJWT, logoutUser);
@@ -48,9 +51,6 @@ router
   .route("/coverImage")
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 
-router
-  .route("/coverImage")
-  .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 router.route("/c/:username").get(verifyJWT, getUserChannelProfile);
 router.route("/history").get(verifyJWT, getWatchHistory);
 
