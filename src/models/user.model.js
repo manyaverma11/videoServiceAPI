@@ -32,6 +32,10 @@ const userSchema = new Schema(
     coverImage: {
       type: String,
     },
+    tweets: {
+      type: Schema.Types.ObjectId,
+        ref: "Tweet",
+    },
     watchHistory: [
       {
         type: Schema.Types.ObjectId,
