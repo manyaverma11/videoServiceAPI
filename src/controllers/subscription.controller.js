@@ -10,8 +10,6 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     const { channelId } = req.params;
     const { subscriberId } = req.body;
 
-    console.log("subscriber id",subscriberId)
-
     // Validate ObjectIds
     if (!isValidObjectId(channelId) || !isValidObjectId(subscriberId)) {
         throw new ApiError(400, "Invalid channel or subscriber id");
@@ -63,7 +61,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     try {
         // Aggregation pipeline to get subscribers
         const channelSubscribers = await Subscription.aggregate([
-            { $match: { channel: mongoose.Types.ObjectId(channelId) } },
+            { $match: { channel: new mongoose.Types.ObjectId(channelId) } },
             {
                 $lookup: {
                     from: "users",
@@ -95,23 +93,23 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
-    const { subscriberId } = req.body
+    const { subscriberId } = req.body;
 
-    // Validate channelId
+    // Validate subscriberId
     if (!isValidObjectId(subscriberId)) {
-        throw new ApiError(400, "Invalid channel ID");
+        throw new ApiError(400, "Invalid subscriber ID");
     }
 
-    // Check if channel exists
+    // Check if subscriber exists
     const subscriber = await User.findById(subscriberId);
     if (!subscriber) {
-        throw new ApiError(404, "Channel not found");
+        throw new ApiError(404, "Subscriber not found");
     }
 
     try {
-        // Aggregation pipeline to get subscribers
+        // Aggregation pipeline to get subscribed channels
         const subscribedChannels = await Subscription.aggregate([
-            { $match: { subscriber: mongoose.Types.ObjectId(subscriberId) } },
+            { $match: { subscriber: new mongoose.Types.ObjectId(subscriberId) } },
             {
                 $lookup: {
                     from: "users",
@@ -120,25 +118,26 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
                     as: "channelsSubscribed"
                 }
             },
-            { $unwind: "$channelsSubscribedTo" },
+            { $unwind: "$channelsSubscribed" },
             { $project: 
                 { 
-                    channelsSubscribedTo: "$channelsSubscribed.username",
+                    channel: "$channelsSubscribed.username", // Assuming you want channel names
                     _id: 0
              }}
         ]);
 
-        // Check if there are no subscribers
+        // Check if there are no subscribed channels
         if (subscribedChannels.length === 0) {
-            return res.status(404).json({ message: 'No subscribers found for this channel.' });
+            return res.status(404).json({ message: 'No subscribed channels found for this user.' });
         }
 
-        // Send the list of subscribers
-        res.status(200).json({ channels: channelsSubscribedTo.map(sub => sub.channel) });
+        // Send the list of subscribed channels
+        res.status(200).json({ channels: subscribedChannels.map(sub => sub.channel) });
     } catch (error) {
-        res.status(500).json({ message: 'Server error', error });
+        console.error('Error fetching subscribed channels:', error); // Log detailed error
+        res.status(500).json({ message: 'Server error', error: error.message }); // Send error message
     }
-})
+});
 
 export {
     toggleSubscription,
