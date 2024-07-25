@@ -15,6 +15,7 @@ const router = Router();
 // Route to publish a new video
 
 router.route("/publish-video").post(
+  verifyJWT,
   upload.fields([
     { name: "video", maxCount: 1 },
     { name: "thumbnail", maxCount: 1 },
@@ -40,11 +41,9 @@ router.route("/update-video/:videoId").patch(
 );
 
 // Route to delete a video by ID
-router.route("/:videoId").delete(verifyJWT, deleteVideo);
+router.route("/delete/:videoId").delete(verifyJWT, deleteVideo);
 
 // Route to toggle publish status
 router.patch("/:videoId/publish", verifyJWT, togglePublishStatus);
-
-router.route("/publish/:videoId").patch(verifyJWT, togglePublishStatus);
 
 export default router;
