@@ -29,10 +29,10 @@ const getVideoComments = asyncHandler(async (req, res) => {
     }
 
     // Query to get total count of comments for pagination
-    const total = await Comment.countDocuments({ videoId });
+    const total = await Comment.countDocuments({ video: videoId });
 
     // Query to fetch comments with pagination and sorting
-    const data = await Comment.find({ videoId })
+    const data = await Comment.find( { video: videoId } )
       .sort({ createdAt: -1 }) // Sort comments by createdAt in descending order
       .skip((pageNumber - 1) * limitNumber) // Skip documents based on page number
       .limit(limitNumber); // Limit the number of documents per page

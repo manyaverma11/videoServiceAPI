@@ -1,4 +1,5 @@
 import { Video } from "../models/video.model.js";
+import { Comment } from "../models/comment.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -284,6 +285,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
 
   // Delete the video document from the database
   await Video.findByIdAndDelete(videoId);
+  await Comment.deleteMany({ video: videoId });
 
   return res
     .status(200)
