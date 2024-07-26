@@ -144,14 +144,23 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 const getVideoById = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
-  //TODO: get video by id
+
+  // Get video by ID
   const video = await Video.findById(videoId);
   if (!video) {
     throw new ApiError(404, "Video not found");
   }
+
+  // Increment view count
+  const updatedVideo = await Video.findByIdAndUpdate(
+    videoId,
+    { $inc: { views: 1 } }, // Increment the view count by 1
+    { new: true } // Return the updated document
+  );
+
   return res
     .status(200)
-    .json(new ApiResponse(200, video, "Video found successfully"));
+    .json(new ApiResponse(200, updatedVideo, "Video found successfully"));
 });
 
 const updateVideo = asyncHandler(async (req, res) => {
