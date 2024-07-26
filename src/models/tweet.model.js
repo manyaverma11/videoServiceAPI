@@ -10,6 +10,11 @@ const tweetSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "User",
     },
+    likeCount:{
+      type: Number,
+      required: true,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

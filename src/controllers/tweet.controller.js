@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { Tweet } from "../models/tweet.model.js";
+import { Like } from "../models/like.model.js";
 import { User } from "../models/user.model.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import mongoose from "mongoose";
@@ -36,7 +37,6 @@ const createTweet = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(201, tweet, "Tweet created successfully"));
 });
-
 
 const getUserTweets = asyncHandler(async (req, res) => {
   // Ensure the user is authenticated
@@ -101,7 +101,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 const updateTweet = asyncHandler(async (req, res) => {
   const { content } = req.body;
   const { tweetId } = req.params;
-  console.log(tweetId)
+  console.log(tweetId);
 
   if (!content || content?.trim() === "") {
     throw new ApiError(400, "Can't send empty tweet");
@@ -131,7 +131,6 @@ const updateTweet = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, tweet, "Tweet updated successfully"));
 });
 
-
 const deleteTweet = asyncHandler(async (req, res) => {
   const { tweetId } = req.params;
 
@@ -143,6 +142,8 @@ const deleteTweet = asyncHandler(async (req, res) => {
   if (!tweet) {
     throw new ApiError(404, "Tweet not found");
   }
+
+  await Like.findByIdAndDelete({ tweet: tweetId });
 
   return res
     .status(200)

@@ -1,5 +1,6 @@
 import mongoose, { isValidObjectId } from "mongoose";
 import { Comment } from "../models/comment.model.js";
+import { Like } from "../models/like.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -32,7 +33,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const total = await Comment.countDocuments({ video: videoId });
 
     // Query to fetch comments with pagination and sorting
-    const data = await Comment.find( { video: videoId } )
+    const data = await Comment.find({ video: videoId })
       .sort({ createdAt: -1 }) // Sort comments by createdAt in descending order
       .skip((pageNumber - 1) * limitNumber) // Skip documents based on page number
       .limit(limitNumber); // Limit the number of documents per page
@@ -97,7 +98,7 @@ const updateComment = asyncHandler(async (req, res) => {
   // Validate commentId
   if (!isValidObjectId(commentId)) {
     throw new ApiError(400, "Invalid comment id");
-}
+  }
 
   // Update the comment
   const comment = await Comment.findByIdAndUpdate(
@@ -126,12 +127,14 @@ const deleteComment = asyncHandler(async (req, res) => {
 
   if (!isValidObjectId(commentId)) {
     throw new ApiError(400, "Invalid comment id");
-}
+  }
 
   const comment = await Comment.findByIdAndDelete(commentId);
   if (!comment) {
     throw new ApiError(404, "Comment not found");
   }
+
+  await Like.findByIdAndDelete({ comment: commentId });
 
   return res
     .status(200)

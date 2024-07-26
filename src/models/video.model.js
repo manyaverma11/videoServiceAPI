@@ -36,6 +36,11 @@ const videoSchema = new Schema(
       ref: "User",
       required: true
     },
+    likeCount:{
+      type: Number,
+      required: true,
+      default: 0,
+    },
     comments: [
       {
         type: Schema.Types.ObjectId,

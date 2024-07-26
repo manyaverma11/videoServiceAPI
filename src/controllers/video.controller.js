@@ -1,5 +1,6 @@
 import { Video } from "../models/video.model.js";
 import { Comment } from "../models/comment.model.js";
+import { Like } from "../models/like.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
@@ -134,7 +135,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
   }
 
   // Toggle publish status
-  await togglePublishStatus(req, res, publishedVideo._id);
+  togglePublishStatus(req, res, publishedVideo._id);
 
   return res
     .status(201)
@@ -286,6 +287,7 @@ const deleteVideo = asyncHandler(async (req, res) => {
   // Delete the video document from the database
   await Video.findByIdAndDelete(videoId);
   await Comment.deleteMany({ video: videoId });
+  await Like.findByIdAndDelete({ video: videoId });
 
   return res
     .status(200)
