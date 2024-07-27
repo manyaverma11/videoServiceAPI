@@ -8,7 +8,7 @@ import {
   removeVideoFromPlaylist,
   deletePlaylist,
   updatePlaylist,
-} from "../controllers/comment.controller.js";
+} from "../controllers/playlist.controller.js";
 
 const router = Router();
 router.route("create-playlist").post(verifyJWT, createPlaylist);

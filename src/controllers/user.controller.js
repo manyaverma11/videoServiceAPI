@@ -115,7 +115,6 @@ const loginUser = asyncHandler(async (req, res) => {
   //   throw new ApiError(400, "username or email is required");
   // }
 
-  
   if (!(username || email)) {
     throw new ApiError(400, "username or email is required");
   }
@@ -249,6 +248,10 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
     throw new ApiError(401, "Invalid old password");
   }
 
+  if (oldPassword === newPassword) {
+    throw new ApiError(400, "New password cannot be the same as old password");
+  }
+
   user.password = newPassword;
   await user.save({ validateBeforeSave: false });
 
@@ -258,9 +261,11 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 });
 
 const getCurrentUser = asyncHandler(async (req, res) => {
-  return res
-    .status(200)
-    .json(200, req.user, "Current user fetched successfully");
+  return res.status(200).json({
+    success: true,
+    message: "Current user fetched successfully",
+    data: req.user,
+  });
 });
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
